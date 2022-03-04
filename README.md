@@ -1,8 +1,9 @@
 # turnUino
-**Modell railway turnout controller with ESP8266 and PCA9685 for Arduino**
+**Model railway turnout controller with ESP8266 and PCA9685 for Arduino**
 
-Control your model railway turnouts easily using laptop or tablet. In map view, just click on the selected element to move the turnouts to the desired position.
-Compatible with ESP8266 based bords, like NodeMCU, Wemos D1, Wemos D1 mini etc.
+Control your model railway turnouts easily using laptop or tablet. In map view, just click on the selected element to move the turnouts to the desired position. You can make your own map and turnout imgages with Scarm, WinTrack or any other model railway planner software. Use **background.png** filename for map, **turn0.png** for default positioned turnout, and **turn1.png** for other positioned turnout. Copy map and turnout images to ***data*** folder and upload to ESP flash rom with Arduino ESP8266 filesystem uploader.
+
+Compatible with ESP8266 based boards, like NodeMCU, Wemos D1, Wemos D1 mini etc.
 
 Screenshot:
 ![wiring](https://github.com/wrobi/turnUino/blob/main/screenshot.png?raw=true "Screenshot")
