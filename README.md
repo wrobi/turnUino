@@ -6,7 +6,9 @@ Screenshot:
 
 Background image maded by Scarm.
 
-Using: 
+Using:
+  If you press an image of turnout, it will changes the state of specified servo.
+  
   For settings press gear icon on top left corner. You can select the id of turnout and change properties.
    - Xpos   : Horizontal position of turnout image in pixels
    - Ypos   : Vertical position of turnout image in pixels
