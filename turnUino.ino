@@ -11,8 +11,8 @@
 #define FREQUENCY 50
 
 // WiFi settings
-const char* ssid = "fym";
-const char* password = "WeiszPatrik21";
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
 
  const char* PARAM_MESSAGE = "value";
 
