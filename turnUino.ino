@@ -1,3 +1,9 @@
+/************************************************************************************
+* turnUino - Modell railway turnout controller with ESP8266 and PCA9685 for Arduino *
+* author: Weisz Robert                                                              *
+* link: https://github.com/wrobi/turnUino                                           *
+* version: v1.0                                                   date: 2022.03.01  *
+************************************************************************************/
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>        // https://github.com/me-no-dev/ESPAsyncTCP
 #include <ESPAsyncWebServer.h>  // https://github.com/me-no-dev/ESPAsyncWebServer
@@ -11,23 +17,29 @@
 #define FREQUENCY 50
 
 // WiFi settings
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
+const char* ssid = "fym";
+const char* password = "WeiszPatrik21";
 
- const char* PARAM_MESSAGE = "value";
+const char* PARAM_MESSAGE = "value";
 
 AsyncWebServer webServer(80);
 
 Adafruit_PWMServoDriver pwmA = Adafruit_PWMServoDriver(0x40);
 Adafruit_PWMServoDriver pwmB = Adafruit_PWMServoDriver(0x41);
-
+/*------------------------------------------------------------------------------
+  function angleToPulse - convert angle to PWM pulses for servo
+  @param angle - angle in degree (0 - 180)
+*/
 int angleToPulse(int angle){
   int pulse_wide, pulse;
   pulse_wide = map(angle, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   pulse = int(float(pulse_wide) / 1000000 * FREQUENCY * 4096);
   return pulse;
 }
-
+/*------------------------------------------------------------------------------
+  function getValue - get Nth item from separated string
+  @param data - input string
+*/
 String getValue(String data, char separator, int index)
 {
     int found = 0;
@@ -43,11 +55,15 @@ String getValue(String data, char separator, int index)
     }
     return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
-
+/*------------------------------------------------------------------------------
+  function notFound - 404 error
+*/
 void notFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain", "Not found");
 }
-
+/*------------------------------------------------------------------------------
+  setup
+*/
 void setup(){
   Serial.begin(115200);
   
@@ -93,7 +109,10 @@ void setup(){
   webServer.on("/gear.png", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/gear.png", "image/png");
   });
-
+/*------------------------------------------------------------------------------
+  /set event - setting servo value
+  @param id_value (eg: a5_25)
+*/
  webServer.on("/set", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String message;
     if (request->hasParam(PARAM_MESSAGE)) {
@@ -113,13 +132,16 @@ void setup(){
     }
     request->send(200, "text/plain", "OK");
   });
-
+/*------------------------------------------------------------------------------
+  /save event - Save data to SPIFFS
+  @param data array toString() (eg:a0,1016,220...)
+*/
   webServer.on("/save", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String message;
     if (request->hasParam(PARAM_MESSAGE)) {
       message = request->getParam(PARAM_MESSAGE)->value();
       String buffer = "var data = [\n";
-      buffer += "//  id\t\t,Xpos\t,Ypos\t,Rotate\t,Mirror\t,Angle0 ,Angle1 ,Enable\n";
+      buffer += "//  id\t\t,Xpos\t,Ypos\t,Rotate\t,Mirror\t,Angle0 ,Angle1 ,Enable\n";  //header
       for (int j=0; j<32; j++) {
         buffer += "  [";
         for (int i=0; i<8; i++) {
