@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- 
   turnUino webpage by Weisz Robert 2022.03.01 
-  Complete project details at https://github.com  
+  Complete project details at https://github.com/wrobi/turnUino.git 
 -->
 <html>
 <head>
@@ -173,14 +173,12 @@
 		<label for="Rotate">Rotate:</label>
 		<input type="number" id="Rotate" value="0" min="0" max="359" step="1" onchange="SpinnerChanged(this)"/>
 		<label for="Mirror">Mirror:</label>
-<!		<input type="number" id="Mirror" value="0" min="0" max="1" step="1" onchange="SpinnerChanged(this)"/>
 		<input type="checkbox" id="Mirror" onchange="CheckboxChanged(this)"/>
 		<label for="Min">Angle0:</label>
 		<input type="number" id="Min" value="0" min="0" max="180" step="1" onchange="SpinnerChanged(this)"/>
 		<label for="Max">Angle1:</label>
 		<input type="number" id="Max" value="0" min="0" max="180" step="1" onchange="SpinnerChanged(this)"/>
 		<label for="Enable">Enable:</label>
-<!		<input type="number" id="Enable" value="0" min="0" max="1" step="1" onchange="SpinnerChanged(this)"/>
 		<input type="checkbox" id="Enable" value="0" onchange="CheckboxChanged(this)"/>
 		<button onclick="saveData()" style="position:absolute; right:30px;">Save</button>
 	</div>
