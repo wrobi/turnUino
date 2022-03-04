@@ -1,0 +1,28 @@
+body, html {
+  height: 100%;
+  margin: 0px 0px 0px 0px;
+}
+
+.container {
+   position: relative;
+   display: inline-block;
+   overflow: hidden;
+}
+ .img {
+    display: block;
+ }
+ .gear {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 2%;
+    opacity: 20%
+ }
+.settings {
+	position: fixed;
+	bottom: 0;
+	background: lightblue;
+	opacity: 70%;
+	padding: 10px;
+	width: 100%;
+}

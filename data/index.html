@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- 
+  turnUino webpage by Weisz Robert 2022.03.01 
+  Complete project details at https://github.com  
+-->
+<html>
+<head>
+  <title>turnUino - Railway Turnout Controller for Arduino</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="data.js"></script>
+  <script src="jquery-3.6.0.min.js"></script>
+  <script src="bootstrap-input-spinner.js"></script>
+</head>
+<body>
+  <script>
+	function indexOf2d(array, search, dim) {
+		var index = 0
+		for (var i = 0; i < array.length; i++) {
+			if (array[i][dim] == search) {
+				index = i;
+			}
+		}
+		return index;
+	}
+    function changeImage(elementId) {
+		var src = document.getElementById(elementId).src;
+		var servoValue = 0;
+		var id  = elementId.substr(0,elementId.indexOf("_"));
+		var dataRow = indexOf2d(data,id,0);
+        if (src.substring(src.length-9) == "turn1.png") {
+			document.getElementById(elementId).src = "./turn0.png";
+			servoValue = data[dataRow][5];
+		} else {
+			document.getElementById(elementId).src = "./turn1.png";
+			servoValue = data[dataRow][6];
+		}
+		var httpRequest = new XMLHttpRequest();
+		httpRequest.open("GET", "/set?value="+id+"_"+servoValue.toString(), true);
+		httpRequest.send();		
+	}
+	function SelectChanged(object) {
+		var dataRow = object.selectedIndex - 1;
+		document.getElementById("xPos").value = data[dataRow][1];
+		document.getElementById("yPos").value = data[dataRow][2];
+		document.getElementById("Rotate").value = data[dataRow][3];
+		document.getElementById("Mirror").checked = (data[dataRow][4]==1) ? true : false;
+		document.getElementById("Min").value = data[dataRow][5];
+		document.getElementById("Max").value = data[dataRow][6];
+		document.getElementById("Enable").checked = (data[dataRow][7]==1) ? true : false;
+	}
+	function SpinnerChanged(object) {
+		var dataRow = document.getElementById("turnout").selectedIndex - 1
+		var value = object.value;
+		if (object.id == "xPos") {
+			data[dataRow][1] = value;
+		}
+		if (object.id == "yPos") {
+			data[dataRow][2] = value;
+		}
+		if (object.id == "Rotate") {
+			data[dataRow][3] = value;
+		}
+		if (object.id == "Min") {
+			data[dataRow][5] = value;
+		}
+		if (object.id == "Max") {
+			data[dataRow][6] = value;
+		}
+		setStyle(dataRow);
+	}
+	function CheckboxChanged(object) {
+		var dataRow = document.getElementById("turnout").selectedIndex - 1
+		var isChecked = object.checked;
+		if (object.id=="Mirror") {
+			if (isChecked) {
+				data[dataRow][4] = 1;
+			} else {
+				data[dataRow][4] = 0;
+			}
+		} else {
+			if (object.id == "Enable") {
+				if (isChecked) {
+					data[dataRow][7] = 1;
+				} else {
+					data[dataRow][7] = 0;
+				}
+			}
+		}
+		setStyle(dataRow);
+	}
+	function setStyle(dataRow) {
+		var el = document.getElementById(data[dataRow][0]);
+		var style = "position:absolute;";
+		style += "left:"+data[dataRow][1]+"px;";
+		style += "top:"+data[dataRow][2]+"px;";
+		el.setAttribute("style",style);
+
+		el = document.getElementById(data[dataRow][0]+"_img");
+		style = "transform:rotate("+data[dataRow][3]+"deg)";
+		if (data[dataRow][4] == 1) {
+			style += " scaleX(-1);";
+		} else {
+			style += " scaleX(1);";
+		}
+		if (data[dataRow][7] == 1) {
+			style += " visibility: visible;";
+		} else {
+			style += " visibility: hidden;";
+		}
+		el.setAttribute("style",style);
+	}
+	function saveData() {
+		var httpRequest = new XMLHttpRequest();
+		httpRequest.open("GET", "/save?value="+data.toString(), true);
+		httpRequest.send();		
+	}
+	function toggleSettings() {
+		var object = document.getElementById("settings")
+		if (object.style.visibility == 'visible') {
+			object.setAttribute("style","visibility:hidden");
+		} else {
+			object.setAttribute("style","visibility:visible");
+		}
+	}
+	</script>
+	<div class="container" id="bg">
+		<img src="background.png" class="img"/>
+		<img src="gear.png" class="gear" onclick="toggleSettings()"/>
+		<div id="turnouts">
+		</div>
+	</div>
+
+	<script>
+	var options = new Array();
+	var parent = document.getElementById("turnouts");
+	for (let j = 0; j < 2; j++) {
+		var port = "a";
+		if (j == 1) {
+			port = "b";
+		}
+		for (let i = 0; i < 16; i++) {
+			var id = port + i.toString();
+			var dataRow = j * 16 + i;
+			var style = "style='transform:rotate("+data[dataRow][3]+"deg)";
+			if (data[dataRow][4] == 1) {
+				style += " scaleX(-1)";
+			}
+			if (data[dataRow][7] == 0 ) {
+				style += "; visibility: hidden";
+			}
+			style += ";'"; 
+			var div = document.createElement('div');
+			div.id = id;
+			div.innerHTML = "<img src='turn0.png'/ id='"+id+"_img' title='"+id+"' width='100%' "+style+" onclick='changeImage(\""+id+"_img\")'>";
+			div.className = "turnout";
+			div.setAttribute("style", "position:absolute; left:"+data[dataRow][1]+"px; top:"+data[dataRow][2]+"px;");
+			parent.appendChild(div);
+			setStyle(i);
+			options.push({"text" :data[dataRow][0]});
+		}
+    }
+	</script>
+	<div class="settings" id="settings" style="visibility: hidden;">
+		<label for="select">id:</label>
+		<select name="select" id="turnout" onchange="SelectChanged(this)">
+			<option>select</option>
+		</select>
+		<label for="xPos">Xpos:</label>
+		<input type="number" id="xPos" value="0" min="0" max="2000" step="1" onchange="SpinnerChanged(this)"/>
+		<label for="yPos">Ypos:</label>
+		<input type="number" id="yPos" value="0" min="0" max="1100" step="1" onchange="SpinnerChanged(this)"/>
+		<label for="Rotate">Rotate:</label>
+		<input type="number" id="Rotate" value="0" min="0" max="359" step="1" onchange="SpinnerChanged(this)"/>
+		<label for="Mirror">Mirror:</label>
+<!		<input type="number" id="Mirror" value="0" min="0" max="1" step="1" onchange="SpinnerChanged(this)"/>
+		<input type="checkbox" id="Mirror" onchange="CheckboxChanged(this)"/>
+		<label for="Min">Angle0:</label>
+		<input type="number" id="Min" value="0" min="0" max="180" step="1" onchange="SpinnerChanged(this)"/>
+		<label for="Max">Angle1:</label>
+		<input type="number" id="Max" value="0" min="0" max="180" step="1" onchange="SpinnerChanged(this)"/>
+		<label for="Enable">Enable:</label>
+<!		<input type="number" id="Enable" value="0" min="0" max="1" step="1" onchange="SpinnerChanged(this)"/>
+		<input type="checkbox" id="Enable" value="0" onchange="CheckboxChanged(this)"/>
+		<button onclick="saveData()" style="position:absolute; right:30px;">Save</button>
+	</div>
+</body>
+<script>
+	var selectBox = document.getElementById('turnout');	
+	for(var i = 0, l = options.length; i < l; i++){
+	  var option = options[i];
+	  selectBox.options.add( new Option(option.text, option.value, option.selected) );
+	}
+</script>
+</html>
