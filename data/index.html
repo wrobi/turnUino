@@ -7,6 +7,7 @@
 <head>
   <title>turnUino - Railway Turnout Controller for Arduino</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">  
   <link rel="stylesheet" type="text/css" href="style.css">
   <script src="data.js"></script>
   <script src="jquery-3.6.0.min.js"></script>
@@ -26,21 +27,26 @@
     function changeImage(elementId) {
 		var src = document.getElementById(elementId).src;
 		var servoValue = 0;
+		var state = "0";
 		var id  = elementId.substr(0,elementId.indexOf("_"));
 		var dataRow = indexOf2d(data,id,0);
         if (src.substring(src.length-9) == "turn1.png") {
 			document.getElementById(elementId).src = "./turn0.png";
 			servoValue = data[dataRow][5];
+			state = "0";
 		} else {
 			document.getElementById(elementId).src = "./turn1.png";
 			servoValue = data[dataRow][6];
+			state = "1";
 		}
+		const $select = document.querySelector('#turnout');
+		$select.value = data[dataRow][0];
+		SelectChanged(dataRow);
 		var httpRequest = new XMLHttpRequest();
-		httpRequest.open("GET", "/set?value="+id+"_"+servoValue.toString(), true);
+		httpRequest.open("GET", "/set?id="+id+"&value="+servoValue.toString()+"&index="+dataRow.toString()+"&state="+state, true);
 		httpRequest.send();		
 	}
-	function SelectChanged(object) {
-		var dataRow = object.selectedIndex - 1;
+	function SelectChanged(dataRow) {
 		document.getElementById("xPos").value = data[dataRow][1];
 		document.getElementById("yPos").value = data[dataRow][2];
 		document.getElementById("Rotate").value = data[dataRow][3];
@@ -112,7 +118,38 @@
 	}
 	function saveData() {
 		var httpRequest = new XMLHttpRequest();
+		httpRequest.timeout = 2000;
+		httpRequest.onreadystatechange = function() {
+			if (this.readyState == 4) {
+				var message;
+				if (this.status == 200) {
+					message = "Saved successfully";
+				} else {
+					message = "Error while saving data.js";
+				}
+				alert(message);
+			}
+		};
 		httpRequest.open("GET", "/save?value="+data.toString(), true);
+		httpRequest.send();		
+	}
+	function getState(index) {
+		var httpRequest = new XMLHttpRequest();
+		httpRequest.timeout = 2000;
+		httpRequest.onreadystatechange = function() {
+		  if (this.readyState == 4 && this.status == 200) {
+			var response = this.responseText;
+			for (var i=0;i<response.length;i++) {
+				var state = (response.substring(i,i+1)=="1") ? 1 : 0
+				var el = document.getElementById(data[i][0]+"_img");
+				var img = el.src
+				if (img.substring(4,5) != state) {
+					el.src = "turn"+state+".png";
+				}
+			}
+		  }
+		};	
+		httpRequest.open("GET", "/getstate?value=1", true);
 		httpRequest.send();		
 	}
 	function toggleSettings() {
@@ -134,12 +171,13 @@
 	<script>
 	var options = new Array();
 	var parent = document.getElementById("turnouts");
-	for (let j = 0; j < 2; j++) {
+	getState();
+	for (let j = 0; j < data.length / 16; j++) {
 		var port = "a";
 		if (j == 1) {
 			port = "b";
 		}
-		for (let i = 0; i < 16; i++) {
+		for (let i = 0; i < data.length / 2 ; i++) {
 			var id = port + i.toString();
 			var dataRow = j * 16 + i;
 			var style = "style='transform:rotate("+data[dataRow][3]+"deg)";
@@ -157,13 +195,13 @@
 			div.setAttribute("style", "position:absolute; left:"+data[dataRow][1]+"px; top:"+data[dataRow][2]+"px;");
 			parent.appendChild(div);
 			setStyle(i);
-			options.push({"text" :data[dataRow][0]});
+			options.push({"text" :data[dataRow][0],"value" :data[dataRow][0]});
 		}
     }
 	</script>
 	<div class="settings" id="settings" style="visibility: hidden;">
 		<label for="select">id:</label>
-		<select name="select" id="turnout" onchange="SelectChanged(this)">
+		<select name="select" id="turnout" onchange="SelectChanged(this.selectedIndex - 1)">
 			<option>select</option>
 		</select>
 		<label for="xPos">Xpos:</label>
@@ -185,7 +223,7 @@
 </body>
 <script>
 	var selectBox = document.getElementById('turnout');	
-	for(var i = 0, l = options.length; i < l; i++){
+	for (let i = 0, l = options.length; i < l; i++){
 	  var option = options[i];
 	  selectBox.options.add( new Option(option.text, option.value, option.selected) );
 	}
