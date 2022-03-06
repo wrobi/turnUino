@@ -7,8 +7,7 @@ Compatible with ESP8266 based boards, like NodeMCU, Wemos D1, Wemos D1 mini etc.
 
 Screenshot:
 ![wiring](https://github.com/wrobi/turnUino/blob/main/screenshot.png?raw=true "Screenshot")
-
-            *This background image maded by Scarm.*
+*This background image maded by Scarm.*
 
 ## Installation
 Prerequisites:
