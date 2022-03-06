@@ -30,11 +30,12 @@ Preparations:
 5. Add your SSID & PASSWORD.
 6. Upload code.
 7. Upload datas with ESP8266 Sketch Data Upload.
-8. Open serial monitor (at 115200) and press reset button on board. Use the getting IP address in your browser.
+8. Open serial monitor (at 115200) and press reset button on board. It will show your main IP address.
 
 
 ## Using:
-  Simply press an image of turnout, it will changes the state of specified servo.
+  -Open your browser, and go to main IP address (eg: 192.168.0.8)
+  -Simply press an image of turnout, it will changes the state of specified servo.
   
   For settings press gear icon on top left corner. You can select the id of turnout and change properties.
    - Xpos   : Horizontal position of turnout image in pixels
@@ -44,8 +45,8 @@ Preparations:
    - Angle0 : Initial servo position for streight state of turnout in degree (0 - 180)
    - Angle1 : Moved servo position for curved state of turnout in degree (0 - 180)
 
-  When you are done editing **all** the items you want, press Save button. Plase note that for saving data ESP using flash ROM, which has writing lifetime limit.
-  For hiding settings panel, press gear icon again. Unsaved modifications remains until reseting the board.
+  When you are done editing **all** of the items you want, press Save button. Plase note that for saving data ESP using flash ROM, which has writing lifetime limit. Unsaved modifications remains until reseting the board, so you can test all settings without saving.
+  For hiding settings panel, press gear icon again. 
 
 ## Wiring:
 ![wiring](https://github.com/wrobi/turnUino/blob/main/wiring.png?raw=true)
