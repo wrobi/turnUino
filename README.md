@@ -34,7 +34,7 @@ Preparations:
 
 
 ## Using:
-  -Open your browser, and go to main IP address (eg: 192.168.0.8)
+  -Open your browser, and go to main IP address (eg: 192.168.0.8) 
   -Simply press an image of turnout, it will changes the state of specified servo.
   
   For settings press gear icon on top left corner. You can select the id of turnout and change properties.
